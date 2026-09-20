@@ -1,0 +1,33 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.createicecream.mixin",
+  "plugin": "com.createicecream.mixinplugin.IceCreamMixinPlugin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "minecraft.BlockEntityCullStateMixin",
+    "minecraft.EntityRendererMixin",
+    "minecraft.LevelRendererAccessor",
+    "create.TrackBlockEntityMixin",
+    "create.BezierConnectionMixin",
+    "create.SafeBlockEntityRendererMixin",
+    "create.KineticBlockEntityRendererMixin",
+    "flywheel.AbstractBlockEntityVisualAccessor",
+    "flywheel.StorageMixin",
+    "minecraft.BufferBuilderAccessor",
+    "create.TrackRendererMixin",
+    "fastsbb.SuperBufferFactoryMixin",
+    "fastsbb.SuperByteBufferBuilderMixin",
+    "fastsbb.ShadedBlockSbbBuilderMixin",
+    "minecraft.EntityCaptureMixin",
+    "minecraft.BlockEntityRenderDispatcherMixin",
+    "minecraft.EntityRenderDispatcherMixin",
+    "minecraft.BufferBuilderBuildMixin",
+    "minecraft.ItemRendererLodMixin",
+    "minecraft.FontLodMixin",
+    "minecraft.SoundEngineMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 0
+  }
+}

@@ -1,0 +1,109 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'net.neoforged.moddev' version '2.0.107'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = "createicecream-neoforge-${minecraft_version}"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+sourceSets {
+    // compile-only API stubs for Sodium/Iris (see src/stubs/java); not included in the mod jar
+    stubs
+}
+
+neoForge {
+    version = project.neo_version
+
+    runs {
+        client {
+            client()
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'mixin.debug.export', 'true'
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+
+    // the stubs reference Minecraft classes (VertexConsumer, VertexFormat, ...)
+    addModdingDependenciesTo(sourceSets.stubs)
+}
+
+repositories {
+    // Create, Ponder (catnip) and Flywheel are published here
+    maven { url = 'https://maven.createmod.net' }
+    mavenCentral()
+}
+
+dependencies {
+    // Flywheel: API + lib for compiling against Visual/Plan/etc. The implementation classes
+    // (dev.engine_room.flywheel.impl.*) are only targeted by string in mixins, but we keep the full
+    // jar on the compile classpath too so IDEs can navigate into them.
+    compileOnly "dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}"
+    compileOnly "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
+
+    // Ponder contains Create's rendering library (net.createmod.catnip.render.*), which the fast renderer
+    // plugs into. Same coordinates Create 6.0.10 itself uses.
+    compileOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}") { transitive = false }
+    stubsCompileOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}") { transitive = false }
+
+    // Sodium, Iris and the two Create track classes: we only need a handful of their members, so
+    // src/stubs/java contains signature-exact stubs instead of depending on the full jars. The stubs are
+    // compile-only and never packaged; at runtime the real classes from the installed mods are used.
+    compileOnly sourceSets.stubs.output
+
+    // To test in a dev client, drop the Create 6.0.10 jar (it bundles Flywheel/Ponder/Registrate)
+    // and Sodium (+ Iris) into run/mods/.
+
+    // Pure-Java unit tests for the ray tracer (no Minecraft needed): ./gradlew test
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+var replaceProperties = [
+        minecraft_version      : minecraft_version,
+        minecraft_version_range: minecraft_version_range,
+        neo_version            : neo_version,
+        neo_version_range      : neo_version_range,
+        loader_version_range   : loader_version_range,
+        create_version_range   : create_version_range,
+        flywheel_version_range : flywheel_version_range,
+        mod_id                 : mod_id,
+        mod_name               : mod_name,
+        mod_license            : mod_license,
+        mod_version            : mod_version,
+        mod_authors            : mod_authors,
+]
+
+processResources {
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+// Ship our license and the MIT notice of CreateBetterFps (parts of its renderer are included).
+tasks.named('jar') {
+    from(rootProject.file('LICENSE')) { into 'META-INF' }
+    from(rootProject.file('THIRD_PARTY_LICENSE_CreateBetterFps.txt')) { into 'META-INF' }
+}

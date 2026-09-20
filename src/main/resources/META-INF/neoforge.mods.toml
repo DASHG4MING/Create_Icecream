@@ -1,0 +1,77 @@
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
+issueTrackerURL = ""
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+# Square PNG in the jar root (src/main/resources/icon.png), shown in the Mods list. Pixel art: no blur.
+logoFile = "icon.png"
+logoBlur = false
+authors = "${mod_authors}"
+# Client-only mod: servers don't need it, and vanilla/modded servers accept clients that have it.
+displayTest = "IGNORE_ALL_VERSION"
+description = '''
+Makes big Create factories and trains smooth, especially with shader packs.
+Hidden machines and trains aren't drawn, far machines animate at a lower framerate, finished models are cached and built on several CPU cores, and small far-away details are skipped. What you can see looks the same.
+Client-only: gameplay and servers are never touched. Press F7 for the statistics panel.
+'''
+
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neo_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "create"
+type = "required"
+versionRange = "${create_version_range}"
+ordering = "AFTER"
+side = "CLIENT"
+
+[[dependencies.${mod_id}]]
+modId = "flywheel"
+type = "required"
+versionRange = "${flywheel_version_range}"
+ordering = "AFTER"
+side = "CLIENT"
+
+# The fast Create renderer needs Sodium's vertex writer API. Without Sodium the mod still works,
+# the fast renderer and model cache just stay off.
+[[dependencies.${mod_id}]]
+modId = "sodium"
+type = "optional"
+versionRange = "[0.6.9,)"
+ordering = "AFTER"
+side = "CLIENT"
+
+[[dependencies.${mod_id}]]
+modId = "iris"
+type = "optional"
+versionRange = "[1.8.8,)"
+ordering = "AFTER"
+side = "CLIENT"
+
+# Create IceCream contains an improved version of CreateBetterFps' renderer (MIT, by MoePus).
+# Running both would make them fight over the same Create classes.
+[[dependencies.${mod_id}]]
+modId = "createbetterfps"
+type = "incompatible"
+reason = "Create IceCream already includes an improved CreateBetterFps renderer. Remove CreateBetterFps."
+versionRange = "[0,)"
+ordering = "NONE"
+side = "CLIENT"
